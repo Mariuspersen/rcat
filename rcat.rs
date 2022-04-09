@@ -1,4 +1,5 @@
 use std::{env, process::exit};
+use std::path::PathBuf;
 use std::io::{self, Read};
 const HELP: &str = "Concatenate FILE(s) to standard output.
 
@@ -50,10 +51,10 @@ fn main() {
     let mut concat_string: String = "".to_string();
     let current_path: String = std::env::current_dir().unwrap().into_os_string().into_string().unwrap();
     args.remove(0);
-    if args.len() < 1 {
+    if args.is_empty() {
         exit(0);
     }
-    
+
     for arg in args.iter().enumerate() {
         if arg.1.starts_with('-') {
             match arg.1.as_str() {
@@ -97,14 +98,15 @@ fn main() {
                 //{println!("Argument {} is not a valid argument",&arg.1); exit(1)},
             }
         } else {
-            let temp = std::fs::read_to_string(format!("{}\\{}",current_path,arg.1)).unwrap_or_default();
+            let path: PathBuf = [&current_path,arg.1].iter().collect();
+            let temp = std::fs::read_to_string(path).unwrap_or_default();
             if !temp.is_empty() {
                 read_files.push(temp);
             }
         }
     }
 
-    for file in read_files {
+    for file in &read_files {
         concat_string.push_str(&file);
     }
 
@@ -132,7 +134,6 @@ fn main() {
             concat_string.push_str("$");
         }
     }
-
     print!("{}",concat_string);
 }
 
