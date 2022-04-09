@@ -1,3 +1,4 @@
+use std::io::Read;
 use std::{env, process::exit};
 use std::path::PathBuf;
 const HELP: &str = "Concatenate FILE(s) to standard output.
@@ -53,8 +54,8 @@ fn main() {
 
     args.remove(0);
     if args.is_empty(){
-            let mut input = String::new();
-            std::io::stdin().read_line(& mut input).expect("Not empty");
+            let mut input:String = String::new();
+            std::io::stdin().read_line(& mut input).unwrap_or_default();
             print!("{}", input);
     }
 
@@ -65,7 +66,7 @@ fn main() {
                 "--help" => {println!("{}",HELP); exit(0)},
                 "-" => {
                     let mut buffer = String::new();
-                    std::io::stdin().read_line(&mut buffer).unwrap_or_default();
+                    std::io::stdin().read_to_string(&mut buffer).unwrap_or_default();
                     read_files.push(buffer);
            
                 }
