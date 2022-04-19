@@ -5,6 +5,9 @@ rcat.exe
 rcat.pdb
 rcat
 world
+test1
+test2
+test3
 rcat_testing
 .vscode/*
 !.vscode/settings.json

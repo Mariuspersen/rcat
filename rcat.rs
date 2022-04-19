@@ -116,8 +116,9 @@ fn main() {
     }
 
     if flags.squeeze_blank {
+        concat_string = concat_string.replace("\r\n", "\n");
         while concat_string.contains("\r\n\r\n\r\n")||concat_string.contains("\n\n\n") {
-            concat_string = concat_string.replace("\r\n\r\n\r\n\r\n", "\n\n\n\n").replace("\n\n\n\n", "\n\n").replace("\n\n\n", "\n\n");
+            concat_string = concat_string.replace("\n\n\n\n", "\n\n").replace("\n\n\n", "\n\n");
         } 
     }
 
