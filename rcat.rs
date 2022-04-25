@@ -1,6 +1,7 @@
 use std::io::Read;
 use std::{env, process::exit};
 use std::path::PathBuf;
+extern crate atty;
 const HELP: &str = "Concatenate FILE(s) to standard output.
 
 With no FILE, or when FILE is -, read standard input.
@@ -51,12 +52,12 @@ fn main() {
     let mut read_files: Vec<String> = [].to_vec();
     let mut concat_string: String = "".to_string();
     let current_path: String = std::env::current_dir().unwrap().into_os_string().into_string().unwrap();
-
+    
     args.remove(0);
-    if args.is_empty(){
-            let mut input:String = String::new();
-            std::io::stdin().read_line(& mut input).unwrap_or_default();
-            print!("{}", input);
+    if args.is_empty() && atty::is(atty::Stream::Stdin) {
+        mimic();
+    } else if args.is_empty() && atty::isnt(atty::Stream::Stdin) {
+        args.push('-'.to_string());
     }
 
     for arg in args.iter().enumerate() {
@@ -65,10 +66,13 @@ fn main() {
                 "--version" => {println!("rcat - concatenate files together\nThis a cat reimplentation is Rust to learn the language and should not be used seriously\nEspecially considering probably a million other people have done exactly the same\nAlso just use the normal version, not everything has to be written in Rust"); exit(0)},
                 "--help" => {println!("{}",HELP); exit(0)},
                 "-" => {
-                    let mut buffer = String::new();
-                    std::io::stdin().read_to_string(&mut buffer).unwrap_or_default();
-                    read_files.push(buffer);
-           
+                    if atty::isnt(atty::Stream::Stdin) {
+                        let mut buffer = String::new();
+                        std::io::stdin().read_to_string(&mut buffer).unwrap_or_default();
+                        read_files.push(buffer);
+                    } else {
+                        mimic();
+                    }
                 }
                 _ => {
                     let mut arg_chars: Vec<char> = arg.1.chars().collect();
@@ -153,4 +157,12 @@ fn main() {
     }
     print!("{}",concat_string);
     exit(0);
+}
+
+fn mimic() {
+    loop {
+        let mut input:String = String::new();
+        std::io::stdin().read_line(& mut input).unwrap_or_default();
+        print!("{}", input);
+    }
 }
